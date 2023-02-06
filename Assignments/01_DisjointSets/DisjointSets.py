@@ -4,38 +4,40 @@
 #                                 05.02.2023                                 #
 #============================================================================#
 
-#Assignment 01 - Disjoint Sets
+# Assignment 01 - Disjoint Sets
+#-- !'Move' Function not working as expected!
 
-input = input()
-n, m = input.split(" ")
+import sys
 
-# Create sets {0}, {1}, ..., {n-1}:
-col = set()
-for i in range(int(n)):
-    col.add(frozenset([i]))
+nums = sys.stdin.readlines()
 
-# Find the set that x belongs to
-def find_set(x):
-    for M in col:
-        if x in M: return M
-    assert False
+n, m = nums[0].split(" ")
+n = int(n)
+m = int(m)
 
-# Operations m
-for i in range(int(m)):
-    op, s, t = input[i].split()
-    S = find_set(int(s))
-    T = find_set(int(t))
+data = [i for i in range(n)]
+
+def find(x):
+    if data[x] != x:
+        data[x] = find(data[data[x]])
+    return data[x]
+
+def move(s, t):
+    S = find(s)
+    T = find(t)
+    if S != T:
+        data[S] = T
+       
+for i in range(m):
+    op, s, t = nums[i+1].split(" ")
+    s, t = int(s), int(t)
+    S, T = find(int(s)), find(int(t))
     
-    if op == "0":
-        if S == T: print("1")
-        else: print("0")
-    
-    if op == "1":
-        col.remove(S)
-        col.remove(T)
-        col.add(S.union(T))
-    
-    if op == "2":
-        S.remove(s)
-        T.union(s)
+    if op == '2':
+        move(s, t)
         
+    if op == '0':
+        print("1" if S==T else "0")
+    
+    if op == '1':
+        data[S] = T
